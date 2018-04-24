@@ -1,0 +1,19 @@
+{
+  "name": "T-Shirt sentiment recommendation engine",
+  "version": "1.0.0",
+  "description": "A simple neural network and sentiment analysis demo made with brain.js and sentiment.",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "compromise": "^11.5.3",
+    "dotenv": "^5.0.0",
+    "express": "^4.16.2",
+    "sentiment": "^4.2.0",
+    "socket.io": "^2.0.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kimmo Ihanus",
+  "license": "ISC"
+}
