@@ -1,5 +1,5 @@
 {
-  "name": "Sentiment recommendation engine",
+  "name": "sentiment-recommendation-engine",
   "version": "1.0.0",
   "description": "A simple neural network and sentiment analysis demo made with brain.js and sentiment.",
   "main": "index.js",
