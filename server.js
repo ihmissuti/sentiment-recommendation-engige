@@ -23,7 +23,7 @@ io.on('connection', function(socket){
         console.log(rating)
         var r1 = sentiment(rating);
         console.dir(r1);
-        if (r1.score == -5 || r1.score == -4) {
+        if (r1.score <= -4 ) {
             var score = 1
             var suggestionText = "That was one ugly T-Shirt. Here's the current suggestion:"
         } else if (r1.score == -3 || r1.score == -2) {
