@@ -43,6 +43,7 @@ io.on('connection', function(socket){
         socket.emit('suggestion text', suggestionText)
         
         mixpanel.track('review', {
+            distinct_id: socket.id,
             review: rating
         });
 
