@@ -47,16 +47,14 @@ form {
 }
 
 .suggestBox {
-
-    
-    border: 0;
+  border: 0;
     border-radius: 0.1875rem;
     display: inline-block;
     position: relative;
     overflow: hidden;
     width: 100%;
     padding: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 35px;
     box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, 0.2);
 }
 
@@ -142,5 +140,16 @@ form {
   .form {
     margin-top: 80px;
   }
+  
+  .suggestBox {
+    border: 0;
+    border-radius: 0.1875rem;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0px 5px 25px 0px rgba(0, 0, 0, 0.2);
+}
 
 }
