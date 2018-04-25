@@ -51,6 +51,10 @@ io.on('connection', function(socket){
     
 })
 
+app.get('/privacy', function(req, res,next) {  
+    res.sendFile(__dirname + '/public/privacy.html');
+})
+
 http.listen((process.env.PORT || 8080), function(){
   console.log('listening on *:8080');
 });
