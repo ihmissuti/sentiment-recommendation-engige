@@ -28,16 +28,16 @@ io.on('connection', function(socket){
             var suggestionText = "That was one ugly T-Shirt. Here's the current suggestion:"
         } else if (r1.score == -3 || r1.score == -2) {
             var score = 2
-            var suggestionText = "Maybe the next on is better. Here's the current suggestion:"
+            var suggestionText = "Maybe the next one is better. Here's the current suggestion:"
         } else if (r1.score == -1 || r1.score == 0 || r1.score == 1) {
             var score = 3
-            var suggestionText = "Thanks. Suggested T-Shirt:"
+            var suggestionText = "Thanks for your review. Here's the current suggestion:"
         } else if (r1.score == 2 || r1.score == 3) {
             var score = 4
-            var suggestionText = "Glad you liked it. Here's suggested T-Shirt for you:"
+            var suggestionText = "Glad you liked it. Here's the current suggestion:"
         } else {
             var score = 5
-            var suggestionText = "Nice! Here's suggested T-Shirt for you:"
+            var suggestionText = "Nice! Here's the current suggestion:"
         }
         socket.emit('score', score)
         socket.emit('suggestion text', suggestionText)
