@@ -12,7 +12,18 @@ var Mixpanel = require('mixpanel');
 // create an instance of the mixpanel client
 var mixpanel = Mixpanel.init(process.env.mixpanel);
 
+var fs = require('file-system');
+
 io.on('connection', function(socket){
+
+    // if (fs.existsSync('./net.json')) {
+        
+    //     var trainingJSON = JSON.parse(fs.readFileSync('./net.json', 'utf8'));
+    //     console.log("on page load training data:")
+    //     console.log(trainingJSON)
+    //     socket.emit('trainingJSON', trainingJSON);
+    // }
+    
     
     mixpanel.track('page load', {
         distinct_id: socket.id
@@ -46,8 +57,15 @@ io.on('connection', function(socket){
             distinct_id: socket.id,
             review: rating
         });
+        
+        // socket.on('net', function(net){
+        //     console.log("Saving the net: ")
+        //     console.log(net)
+        //     fs.writeFileSync('./net.json', JSON.stringify(net, null, '  '));
+        // })
 
     })
+    
     
 })
 

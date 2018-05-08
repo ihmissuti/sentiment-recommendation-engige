@@ -31,8 +31,12 @@
     
  </head>
  <body onLoad="nextTry();">
+ 		
+ 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://unpkg.com/brain.js@1.1.2/browser.min.js"></script>
 	<script src="itemsInStock.js"></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	
 	<script>
 		const color_normalization_factor = 100;
 		const neckline_normalization_factor = 10;
@@ -42,28 +46,40 @@
 			{ input: {color: color_black, hasPrinting: false, neckline: neckline_round, price: 0.1999 }, output: { wanted: 0 } }
 		];
 		let ratingItem;
+		
 		function nextTry(rating){	
+			
+		document.getElementById('result1').innerHTML = '';
+		document.getElementById('result2').innerHTML = '';
 
-			document.getElementById('result1').innerHTML = '';
-			document.getElementById('result2').innerHTML = '';
             if(undefined !== ratingItem){
-            	console.log("training data:")
-            	console.log(trainingData)
                 trainingData.push({ input: ratingItem.trainingInformation, output: { wanted: rating / 4 } });
-                console.log("wanted:")
-                console.log(rating)
             }
-			const network = new brain.NeuralNetwork({
+
+			let network = new brain.NeuralNetwork({
 				activation: 'sigmoid',
 				hiddenLayers: [4]
 			});
+			
 			network.train(trainingData,{ 
 			    iterations: 150,
 			    log: true,           // true to use console.log, when a function is supplied it is used --> Either true or a function
-			      logPeriod: 10   
+			    logPeriod: 10   
 			});
-					// var net = network;
-						let suggestionItemsText = '';
+			
+			// save the net
+			const jsonData = JSON.stringify(network.toJSON());
+			
+			console.log("saved net:")
+			console.log(jsonData)
+			
+			// load the net
+			const json = JSON.parse(jsonData);
+			network = new brain.NeuralNetwork();
+			network.fromJSON(json);
+
+
+			let suggestionItemsText = '';
 			let suggestionItems = [];
 			for(i=0;i<itemsInStock.length;i++){
 				let item = getNormalizedItemFromStock(i);
@@ -93,8 +109,9 @@
 						'<div id="rateThis" class="suggestBox">Suggested T-Shirt</div>' +
 					suggestionItemsText + 
 				'</div>';
-			// return net;
+
 		}
+		
 		
 		function getNormalizedItemFromStock(index){
 			const item = itemsInStock[index];
@@ -184,23 +201,33 @@
   	<!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
+
      
       <script>
 	   /*global  $, io*/
+	   
+	   	 // socket.on('trainingJSON', function(trainingJSON) {
+
+	    	// 		var trainingDataJson = trainingJSON
+		    // 		console.log("trainingData JSON:")
+		    // 		console.log(trainingDataJson)
+		    // 		network.fromJSON(trainingDataJson);
+
+	    // })
 	
 	  $(function () {
 	    var socket = io();
+		
 	    $('form').submit(function(){
 
 	    	socket.emit('rating', $('#m').val());
 	    	$('#m').val('');
 	    	
 	    	socket.on('score', function(score){
-			    nextTry(score);
+	    		nextTry(score)
 			    $('#suggestions').removeClass("hidden");
 			    $('#suggestionBox1').addClass("suggestionBox1");
 			});
