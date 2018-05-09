@@ -121,9 +121,8 @@ io.on('connection', function(socket){
         
         //mongodb storage
         {
-        
-            console.log("saving training data to MongoDB storage")
             
+            //save the training data to mongoDB storage
             trainingMongoJson.findOneAndUpdate({ 'id': 1 }, {$push: {training_data: clientTrainingData }}, { upsert: true, new: true, setDefaultsOnInsert: true }, function(error, res) {
                 
                 if (error) {

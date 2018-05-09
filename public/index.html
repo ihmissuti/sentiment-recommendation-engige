@@ -55,10 +55,7 @@
 
             if(undefined !== ratingItem){
                 trainingData.push({ input: ratingItem.trainingInformation, output: { wanted: rating / 4 } });
-                
-                console.log("training data:")
-                console.log(trainingData)
-                
+
                 //send the training data to server
                 socket.emit('trainingData', trainingData)
             }
@@ -74,11 +71,8 @@
 			    logPeriod: 10   
 			});
 			
-			// save the net
+			// save the net to json
 			const jsonData = JSON.stringify(network.toJSON());
-			// socket.emit('net', jsonData);
-			console.log("saved net:")
-			console.log(jsonData)
 			
 			// load the net
 			const json = JSON.parse(jsonData);
@@ -117,8 +111,6 @@
 				'</div>';
 
 		}
-		
-		
 		
 		function getNormalizedItemFromStock(index){
 			const item = itemsInStock[index];
@@ -201,7 +193,7 @@
 	
 	<footer class="footer">
       <div class="container">
-        <span class="text-muted">Made by Kimmo Ihanus <a href="https://twitter.com/ihmissuti">@ihmissuti</a> | <a href="https://github.com/ihmissuti">Github</a> | <a href="/privacy">Privacy</a> </span>
+        <span class="text-muted"><a href="https://twitter.com/ihmissuti">@ihmissuti</a> | <a href="https://github.com/ihmissuti">Github</a> | <a href="/privacy">Privacy</a> </span>
       </div>
     </footer>
 
