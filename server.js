@@ -92,40 +92,33 @@ io.on('connection', function(socket){
         console.log("training data:")
         console.log(clientTrainingData)
         
-        fs.readFile('trainingData.json', function (err, data) {
+      
+        fs.readFile('trainingData.json', 'utf8', function (err, data) {
+            
+            if (err) {
+                console.log(err)
+            }
+            console.log("data:")
+            console.log(data)
             var json = JSON.parse(data)
             json.push(clientTrainingData)
         
             fs.writeFile('trainingData.json', JSON.stringify(json), null, '  ')
+            
+            let network = new brain.NeuralNetwork({
+				activation: 'sigmoid',
+				hiddenLayers: [4]
+			});
+			
+			network.train(JSON.parse(data),{ 
+			    iterations: 150,
+			    log: true,           // true to use console.log, when a function is supplied it is used --> Either true or a function
+			    logPeriod: 10   
+			});
+            
         })
         
-        // fs.writeFileSync('./trainingData.json', trainingData, null, '  ');
-        // fs.readFile('trainingData.json', function (err, data) {
-        //     var json = JSON.parse(data)
-        //     json.push(trainingData)
-        
-        //     fs.writeFile("results.json", JSON.stringify(json))
-        // })
-        
-        // var existingTrainingData = JSON.parse(fs.readFileSync('./trainingData.json', 'utf8'));
-        // console.log(existingTrainingData);
-        // console.log(typeof existingTrainingData)
-        // // fs.writeFileSync('./trainingData.json', trainingData);
-        
-        // var clientTrainingData = JSON.parse(trainingData)
-        // console.log(clientTrainingData)
-        // console.log(typeof clientTrainingData)
-    
-        // existingTrainingData.push(clientTrainingData)
-        // console.log(existingTrainingData)
-        
-        // var newTrainingData = JSON.stringify(trainingDataJson)
-        // fs.writeFileSync('./trainingData.json', newTrainingData, null, '  ');
-        // var trainingJSON = JSON.parse(fs.readFileSync('./net.json', 'utf8'));
-
-    
     });
-        
     
 })
 
