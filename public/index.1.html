@@ -55,11 +55,6 @@
 
             if(undefined !== ratingItem){
                 trainingData.push({ input: ratingItem.trainingInformation, output: { wanted: rating / 4 } });
-                
-                
-                console.log("training data:")
-                console.log(trainingData)
-                socket.emit('trainingData', trainingData)
             }
 
 			let network = new brain.NeuralNetwork({
@@ -83,7 +78,8 @@
 			const json = JSON.parse(jsonData);
 			network = new brain.NeuralNetwork();
 			network.fromJSON(json);
-			
+
+
 			let suggestionItemsText = '';
 			let suggestionItems = [];
 			for(i=0;i<itemsInStock.length;i++){
@@ -116,7 +112,6 @@
 				'</div>';
 
 		}
-		
 		
 		
 		function getNormalizedItemFromStock(index){

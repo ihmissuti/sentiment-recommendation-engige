@@ -8,6 +8,7 @@ app.use(express.static(path.join(__dirname, '/public')));
 var sentiment = require('sentiment');
 // grab the Mixpanel factory
 var Mixpanel = require('mixpanel');
+var brain = require("brain.js");
  
 // create an instance of the mixpanel client
 var mixpanel = Mixpanel.init(process.env.mixpanel);
@@ -24,10 +25,32 @@ io.on('connection', function(socket){
     //     socket.emit('trainingJSON', trainingJSON);
     // }
     
+//         socket.on('net', function(jsonData) {
+            
+//             var brain = JSON.parse(fs.readFileSync('./net.json', 'utf8'));
+            
+//             let network = new brain.NeuralNetwork({
+// 			    activation: 'sigmoid',
+// 				hiddenLayers: [4]
+// 			});
+			
+// 			network.train(trainingData,{ 
+// 			    iterations: 150,
+// 			    log: true,           // true to use console.log, when a function is supplied it is used --> Either true or a function
+// 			    logPeriod: 10   
+// 			});
+            
+//             console.log("Saving the net: ")
+//             console.log(jsonData)
+//             fs.writeFileSync('./net.json', JSON.stringify(jsonData, null, '  '));
+//             return
+//         })
+    
     
     mixpanel.track('page load', {
         distinct_id: socket.id
     });
+    
     
     socket.on('rating', function(rating){
         
@@ -57,15 +80,52 @@ io.on('connection', function(socket){
             distinct_id: socket.id,
             review: rating
         });
-        
-        // socket.on('net', function(net){
-        //     console.log("Saving the net: ")
-        //     console.log(net)
-        //     fs.writeFileSync('./net.json', JSON.stringify(net, null, '  '));
-        // })
 
     })
+    //rating END
     
+    //training
+    socket.on('trainingData', function(trainingData){
+        
+        var num = trainingData.length - 1
+        var clientTrainingData = trainingData[num]
+        console.log("training data:")
+        console.log(clientTrainingData)
+        
+        fs.readFile('trainingData.json', function (err, data) {
+            var json = JSON.parse(data)
+            json.push(clientTrainingData)
+        
+            fs.writeFile('trainingData.json', JSON.stringify(json), null, '  ')
+        })
+        
+        // fs.writeFileSync('./trainingData.json', trainingData, null, '  ');
+        // fs.readFile('trainingData.json', function (err, data) {
+        //     var json = JSON.parse(data)
+        //     json.push(trainingData)
+        
+        //     fs.writeFile("results.json", JSON.stringify(json))
+        // })
+        
+        // var existingTrainingData = JSON.parse(fs.readFileSync('./trainingData.json', 'utf8'));
+        // console.log(existingTrainingData);
+        // console.log(typeof existingTrainingData)
+        // // fs.writeFileSync('./trainingData.json', trainingData);
+        
+        // var clientTrainingData = JSON.parse(trainingData)
+        // console.log(clientTrainingData)
+        // console.log(typeof clientTrainingData)
+    
+        // existingTrainingData.push(clientTrainingData)
+        // console.log(existingTrainingData)
+        
+        // var newTrainingData = JSON.stringify(trainingDataJson)
+        // fs.writeFileSync('./trainingData.json', newTrainingData, null, '  ');
+        // var trainingJSON = JSON.parse(fs.readFileSync('./net.json', 'utf8'));
+
+    
+    });
+        
     
 })
 
