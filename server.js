@@ -8,11 +8,30 @@ app.use(express.static(path.join(__dirname, '/public')));
 var sentiment = require('sentiment');
 var Mixpanel = require('mixpanel');
 var brain = require("brain.js");
- 
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB_URI);
 // create an instance of the mixpanel client
 var mixpanel = Mixpanel.init(process.env.mixpanel);
-
 var fs = require('file-system');
+
+//connect to Mongo DB
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  // we're connected!
+  console.log("connected to Mongo DB")
+});
+
+var trainingSchema = mongoose.Schema({
+  training_data: [],
+  id: String,
+  timestamp: {
+        type: Date,
+        default: Date.now
+      }
+});
+
+var trainingMongoJson = mongoose.model('training', trainingSchema);
 
 io.on('connection', function(socket){
     
@@ -58,13 +77,16 @@ io.on('connection', function(socket){
     //training data handling START
     socket.on('trainingData', function(trainingData){
         
+        //catch the latest training data from client
+        var num = trainingData.length - 1
+        var clientTrainingData = trainingData[num]
+        console.log("training data:")
+        console.log(clientTrainingData)
+        
+        //local json file storage if no mongodb
         if (!process.env.MONGODB_URI) {
             
-            //catch the latest training data from client
-            var num = trainingData.length - 1
-            var clientTrainingData = trainingData[num]
-            console.log("training data:")
-            console.log(clientTrainingData)
+            console.log("saving training data to local JSON storage")
             
             //push the training data to JSON storage
             fs.readFile('trainingData.json', 'utf8', function (err, data) {
@@ -93,6 +115,27 @@ io.on('connection', function(socket){
                 
             })
 
+        } 
+        
+        else 
+        
+        //mongodb storage
+        {
+        
+            console.log("saving training data to MongoDB storage")
+            
+            trainingMongoJson.findOneAndUpdate({ 'id': 1 }, {$push: {training_data: clientTrainingData }}, { upsert: true, new: true, setDefaultsOnInsert: true }, function(error, res) {
+                
+                if (error) {
+                    console.log(error)
+                    
+                }
+                 
+                console.log("Training updated to MongoDB:")
+                console.log(res)
+        
+            })
+            
         }
         //Training data handling END
     });
