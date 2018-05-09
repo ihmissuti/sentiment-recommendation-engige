@@ -6,7 +6,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 app.use(express.static(path.join(__dirname, '/public')));
 var sentiment = require('sentiment');
-// grab the Mixpanel factory
 var Mixpanel = require('mixpanel');
 var brain = require("brain.js");
  
@@ -16,42 +15,13 @@ var mixpanel = Mixpanel.init(process.env.mixpanel);
 var fs = require('file-system');
 
 io.on('connection', function(socket){
-
-    // if (fs.existsSync('./net.json')) {
-        
-    //     var trainingJSON = JSON.parse(fs.readFileSync('./net.json', 'utf8'));
-    //     console.log("on page load training data:")
-    //     console.log(trainingJSON)
-    //     socket.emit('trainingJSON', trainingJSON);
-    // }
     
-//         socket.on('net', function(jsonData) {
-            
-//             var brain = JSON.parse(fs.readFileSync('./net.json', 'utf8'));
-            
-//             let network = new brain.NeuralNetwork({
-// 			    activation: 'sigmoid',
-// 				hiddenLayers: [4]
-// 			});
-			
-// 			network.train(trainingData,{ 
-// 			    iterations: 150,
-// 			    log: true,           // true to use console.log, when a function is supplied it is used --> Either true or a function
-// 			    logPeriod: 10   
-// 			});
-            
-//             console.log("Saving the net: ")
-//             console.log(jsonData)
-//             fs.writeFileSync('./net.json', JSON.stringify(jsonData, null, '  '));
-//             return
-//         })
-    
-    
+    //track page load to Mixpanel
     mixpanel.track('page load', {
         distinct_id: socket.id
     });
     
-    
+    //catch the rating review from client and respond with a display text for the suggested T-Shirt
     socket.on('rating', function(rating){
         
         console.log(rating)
@@ -76,6 +46,7 @@ io.on('connection', function(socket){
         socket.emit('score', score)
         socket.emit('suggestion text', suggestionText)
         
+        //Mixpanel event tracking
         mixpanel.track('review', {
             distinct_id: socket.id,
             review: rating
@@ -84,40 +55,46 @@ io.on('connection', function(socket){
     })
     //rating END
     
-    //training
+    //training data handling START
     socket.on('trainingData', function(trainingData){
         
-        var num = trainingData.length - 1
-        var clientTrainingData = trainingData[num]
-        console.log("training data:")
-        console.log(clientTrainingData)
-        
-      
-        fs.readFile('trainingData.json', 'utf8', function (err, data) {
+        if (!process.env.MONGODB_URI) {
             
-            if (err) {
-                console.log(err)
-            }
-            console.log("data:")
-            console.log(data)
-            var json = JSON.parse(data)
-            json.push(clientTrainingData)
-        
-            fs.writeFile('trainingData.json', JSON.stringify(json), null, '  ')
+            //catch the latest training data from client
+            var num = trainingData.length - 1
+            var clientTrainingData = trainingData[num]
+            console.log("training data:")
+            console.log(clientTrainingData)
             
-            let network = new brain.NeuralNetwork({
-				activation: 'sigmoid',
-				hiddenLayers: [4]
-			});
-			
-			network.train(JSON.parse(data),{ 
-			    iterations: 150,
-			    log: true,           // true to use console.log, when a function is supplied it is used --> Either true or a function
-			    logPeriod: 10   
-			});
+            //push the training data to JSON storage
+            fs.readFile('trainingData.json', 'utf8', function (err, data) {
+                
+                if (err) {
+                    console.log(err)
+                }
+                console.log("data:")
+                console.log(data)
+                var json = JSON.parse(data)
+                json.push(clientTrainingData)
             
-        })
-        
+                fs.writeFile('trainingData.json', JSON.stringify(json), null, '  ')
+                
+                let network = new brain.NeuralNetwork({
+    				activation: 'sigmoid',
+    				hiddenLayers: [4]
+    			});
+    			
+    			//train the net
+    			network.train(JSON.parse(data),{ 
+    			    iterations: 150,
+    			    log: true,
+    			    logPeriod: 10   
+    			});
+                
+            })
+
+        }
+        //Training data handling END
     });
     
 })

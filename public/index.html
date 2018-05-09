@@ -56,9 +56,10 @@
             if(undefined !== ratingItem){
                 trainingData.push({ input: ratingItem.trainingInformation, output: { wanted: rating / 4 } });
                 
-                
                 console.log("training data:")
                 console.log(trainingData)
+                
+                //send the training data to server
                 socket.emit('trainingData', trainingData)
             }
 
