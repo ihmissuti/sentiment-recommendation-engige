@@ -1,9 +1,6 @@
-### A simple neural network and sentiment analysis demo made by modifying an original recommendation engine example made by brain.js. ###
+### A simple neural network and sentiment analysis demo ###
 
-Original brain.js example:
-https://github.com/BrainJS/brain.js/tree/develop/examples/recommendation-engine
-
-Brain.js:
+Made with Brain.js:
 https://github.com/BrainJS/brain.js
 
 How it works:
